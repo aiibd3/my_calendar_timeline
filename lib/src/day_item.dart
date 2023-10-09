@@ -32,13 +32,19 @@ class DayItem extends StatelessWidget {
   Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
+
     var selectFont = 12.0;
+    var dayNameFont = selectFont-4;
+
     if (size!.height <= 350) {
       selectFont = 12.0;
+      dayNameFont = selectFont-4;
     } else if (size!.height < 45) {
       selectFont = 18.0;
+      dayNameFont = selectFont-4;
     } else {
       selectFont = 24.0;
+      dayNameFont = selectFont-4;
     }
     final textStyle = TextStyle(
       color: available
@@ -66,15 +72,16 @@ class DayItem extends StatelessWidget {
               )
             : const BoxDecoration(color: Colors.transparent),
         height: size!.height * 0.10,
-        width: size!.height * 0.7,
+        width: size!.width * 0.7,
         child: Column(
           children: <Widget>[
-            if (isSelected) ...[
-              SizedBox(height: shrink ? 6 : 7),
-              if (!shrink) _buildDots(),
-              SizedBox(height: shrink ? 9 : 12),
-            ] else
-              SizedBox(height: shrink ? 10 : 14),
+            // if (isSelected) ...[
+            //   SizedBox(height: shrink ? 6 : 7),
+            //   if (!shrink) _buildDots(),
+            //   SizedBox(height: shrink ? 9 : 12),
+            // ] else
+
+            SizedBox(height: shrink ? 10 : 14),
             Text(
               dayNumber.toString(),
               style: isSelected ? selectedStyle : textStyle,
@@ -85,7 +92,7 @@ class DayItem extends StatelessWidget {
                 style: TextStyle(
                   color: dayNameColor ?? activeDayColor ?? Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: shrink ? 9 : 14,
+                  fontSize:dayNameFont,
                 ),
               ),
           ],
