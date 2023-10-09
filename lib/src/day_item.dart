@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Creates a Widget representing the day.
 class DayItem extends StatelessWidget {
-   DayItem({
+  DayItem({
     Key? key,
     required this.dayNumber,
     required this.shortName,
@@ -32,6 +32,14 @@ class DayItem extends StatelessWidget {
   Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
+    var selectFont = 12.0;
+    if (size!.height <= 350) {
+      selectFont = 12.0;
+    } else if (size!.height < 45) {
+      selectFont = 18.0;
+    } else {
+      selectFont = 24.0;
+    }
     final textStyle = TextStyle(
       color: available
           ? dayColor ?? Theme.of(context).colorScheme.secondary
@@ -42,7 +50,7 @@ class DayItem extends StatelessWidget {
     );
     final selectedStyle = TextStyle(
       color: activeDayColor ?? Colors.white,
-      fontSize: shrink ? 14 : 24,
+      fontSize: selectFont,
       fontWeight: FontWeight.bold,
       height: 0.8,
     );
@@ -57,8 +65,8 @@ class DayItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               )
             : const BoxDecoration(color: Colors.transparent),
-        height: size!.height*0.10,
-        width: 100,
+        height: size!.height * 0.10,
+        width: size!.height * 0.7,
         child: Column(
           children: <Widget>[
             if (isSelected) ...[
@@ -104,7 +112,7 @@ class DayItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     size = MediaQuery.of(context).size;
+    size = MediaQuery.of(context).size;
     return _buildDay(context);
   }
 }
