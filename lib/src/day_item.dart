@@ -72,14 +72,14 @@ class DayItem extends StatelessWidget {
               )
             : const BoxDecoration(color: Colors.transparent),
         height: size!.height * 0.10,
-        width: size!.width * 0.10,
+        width: size!.width * 0.20,
         child: Column(
           children: <Widget>[
-            if (isSelected) ...[
-              SizedBox(height: shrink ? 6 : 7),
-              if (!shrink) _buildDots(),
-              SizedBox(height: shrink ? 9 : 12),
-            ] else
+            // if (isSelected) ...[
+            //   SizedBox(height: shrink ? 6 : 7),
+            //   if (!shrink) _buildDots(),
+            //   SizedBox(height: shrink ? 9 : 12),
+            // ] else
 
             SizedBox(height: shrink ? 10 : 14),
             Text(
