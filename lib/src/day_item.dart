@@ -36,10 +36,10 @@ class DayItem extends StatelessWidget {
     var selectFont = 12.0;
     var dayNameFont = selectFont-4;
 
-    if (size!.height <= 350) {
+    if (size!.height <= 300) {
       selectFont = 12.0;
       dayNameFont = selectFont-4;
-    } else if (size!.height < 45) {
+    } else if (size!.height < 450) {
       selectFont = 18.0;
       dayNameFont = selectFont-4;
     } else {
@@ -72,14 +72,14 @@ class DayItem extends StatelessWidget {
               )
             : const BoxDecoration(color: Colors.transparent),
         height: size!.height * 0.10,
-        width: size!.width * 0.1,
+        width: size!.width * 0.10,
         child: Column(
           children: <Widget>[
-            // if (isSelected) ...[
-            //   SizedBox(height: shrink ? 6 : 7),
-            //   if (!shrink) _buildDots(),
-            //   SizedBox(height: shrink ? 9 : 12),
-            // ] else
+            if (isSelected) ...[
+              SizedBox(height: shrink ? 6 : 7),
+              if (!shrink) _buildDots(),
+              SizedBox(height: shrink ? 9 : 12),
+            ] else
 
             SizedBox(height: shrink ? 10 : 14),
             Text(
