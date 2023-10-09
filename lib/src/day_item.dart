@@ -37,7 +37,7 @@ class DayItem extends StatelessWidget {
     var dayNameFont = selectFont-4;
 
     if (size!.height <= 300) {
-      selectFont = 11.0;
+      selectFont = 12.0;
       dayNameFont = selectFont-4;
     } else if (size!.height < 450) {
       selectFont = 18.0;
