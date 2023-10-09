@@ -75,11 +75,11 @@ class DayItem extends StatelessWidget {
         width: size!.width * 0.30,
         child: Column(
           children: <Widget>[
-            // if (isSelected) ...[
-            //   SizedBox(height: shrink ? 6 : 7),
-            //   if (!shrink) _buildDots(),
-            //   SizedBox(height: shrink ? 9 : 12),
-            // ] else
+            if (isSelected) ...[
+              SizedBox(height: shrink ? 6 : 7),
+              if (!shrink) _buildDots(),
+              SizedBox(height: shrink ? 9 : 12),
+            ] else
 
             SizedBox(height: shrink ? 10 : 14),
             Text(
