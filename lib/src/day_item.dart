@@ -57,7 +57,7 @@ class DayItem extends StatelessWidget {
     final selectedStyle = TextStyle(
       color: activeDayColor ?? Colors.white,
       fontSize: selectFont,
-      fontWeight: FontWeight.bold,
+      // fontWeight: FontWeight.bold,
       height: 0.8,
     );
 
