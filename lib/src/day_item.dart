@@ -63,15 +63,16 @@ class DayItem extends StatelessWidget {
     return GestureDetector(
       onTap: available ? onTap as void Function()? : null,
       child: Container(
+        padding: const EdgeInsets.all(10),
         decoration: isSelected
             ? BoxDecoration(
                 color: activeDayBackgroundColor ??
                     Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(100),
               )
             : const BoxDecoration(color: Colors.transparent),
-        height: size!.height * 0.20,
-        width: size!.width * 0.30,
+        // height: size!.height * 0.10,
+        // width: size!.width * 0.20,
         child: Column(
           children: <Widget>[
             // if (isSelected) ...[
