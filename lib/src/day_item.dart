@@ -32,19 +32,18 @@ class DayItem extends StatelessWidget {
   Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
-
     var selectFont = 12.0;
-    var dayNameFont = selectFont-4;
+    var dayNameFont = selectFont - 4;
 
     if (size!.height <= 300) {
-      selectFont = 12.0;
-      dayNameFont = selectFont-4;
+      selectFont = 10.0;
+      dayNameFont = selectFont - 4;
     } else if (size!.height < 450) {
-      selectFont = 18.0;
-      dayNameFont = selectFont-4;
+      selectFont = 14.0;
+      dayNameFont = selectFont - 4;
     } else {
-      selectFont = 24.0;
-      dayNameFont = selectFont-4;
+      selectFont = 16.0;
+      dayNameFont = selectFont - 4;
     }
     final textStyle = TextStyle(
       color: available
@@ -92,7 +91,7 @@ class DayItem extends StatelessWidget {
                 style: TextStyle(
                   color: dayNameColor ?? activeDayColor ?? Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize:dayNameFont,
+                  fontSize: dayNameFont,
                 ),
               ),
           ],
