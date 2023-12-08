@@ -1,6 +1,5 @@
 import 'package:calendar_timeline/src/day_item.dart';
 import 'package:calendar_timeline/src/month_item.dart';
-import 'package:calendar_timeline/src/util/utils.dart';
 import 'package:calendar_timeline/src/year_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -308,13 +307,24 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    _scrollAlignment = widget.leftMargin / MediaQuery.of(context).size.width;
+    _scrollAlignment =
+        widget.leftMargin * 2 / MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (widget.showYears) _buildYearList(),
-        _buildMonthList(),
+        if (widget.showYears)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: _buildYearList(),
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: _buildMonthList(),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         _buildDayList(),
       ],
     );
@@ -338,7 +348,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
           final yearName = DateFormat.y(_locale).format(currentDate);
 
           return Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
+            padding: const EdgeInsets.only(right: 12, left: 12),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -357,7 +367,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
                     width: MediaQuery.of(context).size.width -
                         widget.leftMargin -
                         (yearName.length * 10),
-                  )
+                  ),
               ],
             ),
           );
@@ -415,7 +425,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
                     width: MediaQuery.of(context).size.width -
                         widget.leftMargin -
                         (monthName.length * 10),
-                  )
+                  ),
               ],
             ),
           );
@@ -430,7 +440,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   Widget _buildDayList() {
     return SizedBox(
       key: const Key('ScrollableDayList'),
-      height: 70,
+      height: 90,
       child: ScrollablePositionedList.builder(
         itemScrollController: _controllerDay,
         initialScrollIndex: _daySelectedIndex ?? 0,
@@ -440,8 +450,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
         padding: EdgeInsets.only(left: widget.leftMargin, right: 6),
         itemBuilder: (BuildContext context, int index) {
           final currentDay = _days[index];
-          final shortName =
-              DateFormat.EEEE(_locale).format(currentDay);
+          final shortName = DateFormat.EEEE(_locale).format(currentDay);
           return Row(
             children: <Widget>[
               DayItem(
@@ -464,7 +473,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
                   width: MediaQuery.of(context).size.width -
                       widget.leftMargin -
                       65,
-                )
+                ),
             ],
           );
         },

@@ -32,88 +32,64 @@ class DayItem extends StatelessWidget {
   Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
-    var selectFont = 12.0;
-    var dayNameFont = selectFont - 4;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    var selectFont = 14.0;
+    var dayNameFont = selectFont - 2;
 
     if (size!.height <= 300) {
-      selectFont = 10.0;
-      dayNameFont = selectFont - 4;
+      selectFont = 12.0;
+      dayNameFont = selectFont - 2;
     } else if (size!.height < 450) {
-      selectFont = 14.0;
-      dayNameFont = selectFont - 4;
-    } else {
       selectFont = 16.0;
-      dayNameFont = selectFont - 4;
+      dayNameFont = selectFont - 2;
+    } else {
+      selectFont = 18.0;
+      dayNameFont = selectFont - 2;
     }
-    final textStyle = TextStyle(
-      color: available
-          ? dayColor ?? Theme.of(context).colorScheme.secondary
-          : dayColor?.withOpacity(0.5) ??
-              Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-      fontSize: dayNameFont,
-      // fontWeight: FontWeight.normal,
-    );
-    final selectedStyle = TextStyle(
-      color: activeDayColor ?? Colors.white,
-      fontSize: selectFont,
-      // fontWeight: FontWeight.bold,
-      height: 0.8,
-    );
+    final textStyle = Theme.of(context).textTheme.headlineMedium;
+    final selectedStyle = Theme.of(context).textTheme.headlineMedium!.copyWith(
+          color: activeDayColor ?? Colors.white,
+          fontSize: selectFont,
+          fontWeight: FontWeight.bold,
+          height: 0.8,
+        );
 
     return GestureDetector(
       onTap: available ? onTap as void Function()? : null,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: isSelected
-            ? BoxDecoration(
-                color: activeDayBackgroundColor ??
-                    Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(100),
-              )
-            : const BoxDecoration(color: Colors.transparent),
-        // height: size!.height * 0.10,
-        // width: size!.width * 0.20,
-        child: Column(
-          children: <Widget>[
-            // if (isSelected) ...[
-            //   SizedBox(height: shrink ? 6 : 7),
-            //   if (!shrink) _buildDots(),
-            //   SizedBox(height: shrink ? 9 : 12),
-            // ] else
-
-            SizedBox(height: shrink ? 10 : 14),
-            Text(
-              dayNumber.toString(),
-              style: isSelected ? selectedStyle : textStyle,
+      child: Column(
+        children: [
+          Text(
+            shortName.substring(0, 1),
+            style: TextStyle(
+              color: isLight ? Colors.black : Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: dayNameFont,
             ),
-            if (isSelected)
-              Text(
-                shortName,
-                style: TextStyle(
-                  color: dayNameColor ?? activeDayColor ?? Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: dayNameFont,
-                ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+            padding: const EdgeInsets.all(15),
+            decoration: isSelected
+                ? BoxDecoration(
+                    color: activeDayBackgroundColor ??
+                        Theme.of(context).colorScheme.secondary,
+                    // borderRadius: BorderRadius.circular(300),
+                    shape: BoxShape.circle,
+                  )
+                : const BoxDecoration(color: Colors.transparent),
+            // height: size!.height * 0.10,
+            // width: size!.width * 0.20,
+            child: Center(
+              child: Text(
+                dayNumber.toString(),
+                style: isSelected ? selectedStyle : textStyle,
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildDots() {
-    final dot = Container(
-      height: 5,
-      width: 5,
-      decoration: BoxDecoration(
-        color: dotsColor ?? activeDayColor ?? Colors.white,
-        shape: BoxShape.circle,
-      ),
-    );
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [dot, dot],
     );
   }
 
