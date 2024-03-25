@@ -46,12 +46,12 @@ class DayItem extends StatelessWidget {
       selectFont = 18.0;
       dayNameFont = selectFont - 2;
     }
-    final textStyle = Theme.of(context).textTheme.headlineMedium;
+    final textStyle = Theme.of(context).textTheme.headlineSmall;
     final selectedStyle = Theme.of(context).textTheme.headlineMedium!.copyWith(
           color: activeDayColor ?? Colors.white,
-          fontSize: selectFont,
+          // fontSize: selectFont,
           fontWeight: FontWeight.bold,
-          height: 0.8,
+          // height: 0.8,
         );
 
     return GestureDetector(
