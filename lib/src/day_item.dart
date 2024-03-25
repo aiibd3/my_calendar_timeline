@@ -56,39 +56,40 @@ class DayItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: available ? onTap as void Function()? : null,
-      child: Column(
-        children: [
-          Text(
-            shortName.substring(0, 1),
-            style: TextStyle(
-              color: isLight ? Colors.black : Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: dayNameFont,
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: isSelected
+            ? BoxDecoration(
+                color: activeDayBackgroundColor ??
+                    Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(100),
+              )
+            : const BoxDecoration(color: Colors.transparent),
+        child: Column(
+          children: [
+            Text(
+              shortName.substring(0, 1),
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.white
+                    : isLight
+                        ? Colors.black
+                        : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: dayNameFont,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: isSelected
-                ? BoxDecoration(
-                    color: activeDayBackgroundColor ??
-                        Theme.of(context).colorScheme.secondary,
-                    // borderRadius: BorderRadius.circular(300),
-                    shape: BoxShape.circle,
-                  )
-                : const BoxDecoration(color: Colors.transparent),
-            // height: size!.height * 0.10,
-            // width: size!.width * 0.20,
-            child: Center(
+            const SizedBox(
+              height: 10,
+            ),
+            Center(
               child: Text(
                 dayNumber.toString(),
                 style: isSelected ? selectedStyle : textStyle,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
