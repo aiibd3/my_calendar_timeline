@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Creates a Widget representing the day.
 class DayItem extends StatelessWidget {
-  DayItem({
+  const DayItem({
     Key? key,
     required this.dayNumber,
     required this.shortName,
@@ -16,6 +16,14 @@ class DayItem extends StatelessWidget {
     this.available = true,
     this.dotsColor,
     this.dayNameColor,
+    required this.height,
+    required this.width,
+    required this.shrinkHeight,
+    required this.shrinkWidth,
+    required this.fontSize,
+    required this.shrinkFontSize,
+    required this.dayNameFontSize,
+    required this.shrinkDayNameFontSize,
     this.shrink = false,
   }) : super(key: key);
   final int dayNumber;
@@ -28,36 +36,35 @@ class DayItem extends StatelessWidget {
   final bool available;
   final Color? dotsColor;
   final Color? dayNameColor;
+  final double height;
+  final double width;
+  final double shrinkHeight;
+  final double shrinkWidth;
+  final double fontSize;
+  final double shrinkFontSize;
+  final double dayNameFontSize;
+  final double shrinkDayNameFontSize;
   final bool shrink;
-  Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
-    var selectFont = 14.0;
-    var dayNameFont = selectFont - 2;
-
-    if (size!.height <= 300) {
-      selectFont = 12.0;
-      dayNameFont = selectFont - 2;
-    } else if (size!.height < 450) {
-      selectFont = 16.0;
-      dayNameFont = selectFont - 2;
-    } else {
-      selectFont = 18.0;
-      dayNameFont = selectFont - 2;
-    }
-    final textStyle = Theme.of(context).textTheme.headlineSmall;
-    final selectedStyle = Theme.of(context).textTheme.headlineMedium!.copyWith(
-          color: activeDayColor ?? Colors.white,
-          // fontSize: selectFont,
-          fontWeight: FontWeight.bold,
-          // height: 0.8,
-        );
+    final textStyle = TextStyle(
+      color: available
+          ? dayColor ?? Theme.of(context).colorScheme.secondary
+          : dayColor?.withOpacity(0.5) ??
+              Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+      fontSize: shrink ? shrinkFontSize : fontSize,
+      height: 0.8,
+    );
+    final selectedStyle = TextStyle(
+      color: activeDayColor ?? Colors.white,
+      fontSize: shrink ? shrinkFontSize : fontSize,
+      fontWeight: FontWeight.bold,
+      height: 0.8,
+    );
 
     return GestureDetector(
       onTap: available ? onTap as void Function()? : null,
       child: Container(
-        padding: const EdgeInsets.all(18),
         decoration: isSelected
             ? BoxDecoration(
                 color: activeDayBackgroundColor ??
@@ -65,27 +72,38 @@ class DayItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(100),
               )
             : const BoxDecoration(color: Colors.transparent),
+        height: shrink ? shrinkHeight : height,
+        width: shrink ? shrinkWidth : width,
         child: Column(
-          children: [
-            Text(
-              shortName.substring(0, 1),
-              style: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : isLight
-                        ? Colors.black
-                        : Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: dayNameFont,
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            if (isSelected)
+              Column(
+                children: [
+                  SizedBox(height: shrink ? 6 : 7),
+                  if (!shrink) _buildDots(),
+                  SizedBox(height: shrink ? 6 : 7),
+                ],
+              )
+            else
+              SizedBox(height: shrink ? 12 : 19),
             Center(
               child: Text(
                 dayNumber.toString(),
                 style: isSelected ? selectedStyle : textStyle,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                shortName,
+                style: TextStyle(
+                  color: isSelected
+                      ? dayNameColor ?? activeDayColor ?? Colors.white
+                      : Colors.transparent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: shrink ? shrinkDayNameFontSize : dayNameFontSize,
+                ),
               ),
             ),
           ],
@@ -94,9 +112,27 @@ class DayItem extends StatelessWidget {
     );
   }
 
+  Widget _buildDots() {
+    final dot = Container(
+      height: 5,
+      width: 5,
+      decoration: BoxDecoration(
+        color: dotsColor ?? activeDayColor ?? Colors.white,
+        shape: BoxShape.circle,
+      ),
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [dot, dot],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
-    return _buildDay(context);
+    return MouseRegion(
+      cursor: available ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: _buildDay(context),
+    );
   }
 }

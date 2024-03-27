@@ -1,5 +1,6 @@
 import 'package:calendar_timeline/src/day_item.dart';
 import 'package:calendar_timeline/src/month_item.dart';
+import 'package:calendar_timeline/src/util/utils.dart';
 import 'package:calendar_timeline/src/year_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -27,6 +28,14 @@ class CalendarTimeline extends StatefulWidget {
     this.monthColor,
     this.dotsColor,
     this.dayNameColor,
+    this.height = 80,
+    this.width = 60,
+    this.shrinkHeight = 50,
+    this.shrinkWidth = 33,
+    this.fontSize = 32,
+    this.shrinkFontSize = 14,
+    this.dayNameFontSize = 14,
+    this.shrinkDayNameFontSize = 9,
     this.shrink = false,
     this.locale,
     this.showYears = false,
@@ -63,6 +72,14 @@ class CalendarTimeline extends StatefulWidget {
   final Color? monthColor;
   final Color? dotsColor;
   final Color? dayNameColor;
+  final double height;
+  final double width;
+  final double shrinkHeight;
+  final double shrinkWidth;
+  final double fontSize;
+  final double shrinkFontSize;
+  final double dayNameFontSize;
+  final double shrinkDayNameFontSize;
   final bool shrink;
   final String? locale;
 
@@ -247,8 +264,8 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
     _moveToYearIndex(index);
 
     // Reset month and day index
-    _monthSelectedIndex = null;
-    _daySelectedIndex = null;
+    _monthSelectedIndex = 0;
+    _daySelectedIndex = 0;
 
     // Regenerate months and days
     final date = _years[index];
@@ -307,24 +324,13 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    _scrollAlignment =
-        widget.leftMargin * 2 / MediaQuery.of(context).size.width;
+    _scrollAlignment = widget.leftMargin / MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (widget.showYears)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: _buildYearList(),
-          ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: _buildMonthList(),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
+        if (widget.showYears) _buildYearList(),
+        _buildMonthList(),
         _buildDayList(),
       ],
     );
@@ -348,7 +354,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
           final yearName = DateFormat.y(_locale).format(currentDate);
 
           return Padding(
-            padding: const EdgeInsets.only(right: 12, left: 12),
+            padding: const EdgeInsets.only(right: 12, left: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -440,7 +446,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   Widget _buildDayList() {
     return SizedBox(
       key: const Key('ScrollableDayList'),
-      height: MediaQuery.of(context).size.height * 0.1,
+      height: widget.shrink ? widget.shrinkHeight : widget.height,
       child: ScrollablePositionedList.builder(
         itemScrollController: _controllerDay,
         initialScrollIndex: _daySelectedIndex ?? 0,
@@ -450,13 +456,16 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
         padding: EdgeInsets.only(left: widget.leftMargin, right: 6),
         itemBuilder: (BuildContext context, int index) {
           final currentDay = _days[index];
-          final shortName = DateFormat.EEEE(_locale).format(currentDay);
+          final shortName =
+              DateFormat.E(_locale).format(currentDay).capitalize();
           return Row(
             children: <Widget>[
               DayItem(
                 isSelected: _isSelectedDay(index),
                 dayNumber: currentDay.day,
-                shortName: shortName,
+                shortName: shortName.length > 3
+                    ? shortName.substring(0, 3)
+                    : shortName,
                 onTap: () => _onSelectDay(index),
                 available: widget.selectableDayPredicate == null ||
                     widget.selectableDayPredicate!(currentDay),
@@ -465,6 +474,14 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
                 activeDayBackgroundColor: widget.activeBackgroundDayColor,
                 dotsColor: widget.dotsColor,
                 dayNameColor: widget.dayNameColor,
+                height: widget.height,
+                width: widget.width,
+                shrinkHeight: widget.shrinkHeight,
+                shrinkWidth: widget.shrinkWidth,
+                fontSize: widget.fontSize,
+                shrinkFontSize: widget.shrinkFontSize,
+                dayNameFontSize: widget.dayNameFontSize,
+                shrinkDayNameFontSize: widget.shrinkDayNameFontSize,
                 shrink: widget.shrink,
               ),
               if (index == _days.length - 1)
