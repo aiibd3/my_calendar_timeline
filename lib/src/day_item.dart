@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 /// Creates a Widget representing the day.
 class DayItem extends StatelessWidget {
-  DayItem({
+  const DayItem({
     Key? key,
     required this.dayNumber,
     required this.shortName,
@@ -16,6 +16,14 @@ class DayItem extends StatelessWidget {
     this.available = true,
     this.dotsColor,
     this.dayNameColor,
+    required this.height,
+    required this.width,
+    required this.shrinkHeight,
+    required this.shrinkWidth,
+    required this.fontSize,
+    required this.shrinkFontSize,
+    required this.dayNameFontSize,
+    required this.shrinkDayNameFontSize,
     this.shrink = false,
   }) : super(key: key);
   final int dayNumber;
@@ -28,36 +36,29 @@ class DayItem extends StatelessWidget {
   final bool available;
   final Color? dotsColor;
   final Color? dayNameColor;
+  final double height;
+  final double width;
+  final double shrinkHeight;
+  final double shrinkWidth;
+  final double fontSize;
+  final double shrinkFontSize;
+  final double dayNameFontSize;
+  final double shrinkDayNameFontSize;
   final bool shrink;
-  Size? size;
 
   GestureDetector _buildDay(BuildContext context) {
-
-    var selectFont = 12.0;
-    var dayNameFont = selectFont-4;
-
-    if (size!.height <= 300) {
-      selectFont = 12.0;
-      dayNameFont = selectFont-4;
-    } else if (size!.height < 450) {
-      selectFont = 18.0;
-      dayNameFont = selectFont-4;
-    } else {
-      selectFont = 24.0;
-      dayNameFont = selectFont-4;
-    }
     final textStyle = TextStyle(
       color: available
           ? dayColor ?? Theme.of(context).colorScheme.secondary
           : dayColor?.withOpacity(0.5) ??
               Theme.of(context).colorScheme.secondary.withOpacity(0.5),
-      fontSize: dayNameFont,
-      // fontWeight: FontWeight.normal,
+      fontSize: shrink ? shrinkFontSize : fontSize,
+      height: 0.8,
     );
     final selectedStyle = TextStyle(
       color: activeDayColor ?? Colors.white,
-      fontSize: selectFont,
-      // fontWeight: FontWeight.bold,
+      fontSize: shrink ? shrinkFontSize : fontSize,
+      fontWeight: FontWeight.bold,
       height: 0.8,
     );
 
@@ -68,33 +69,43 @@ class DayItem extends StatelessWidget {
             ? BoxDecoration(
                 color: activeDayBackgroundColor ??
                     Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(100),
               )
             : const BoxDecoration(color: Colors.transparent),
-        height: size!.height * 0.20,
-        width: size!.width * 0.30,
+        height: shrink ? shrinkHeight : height,
+        width: shrink ? shrinkWidth : width,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            // if (isSelected) ...[
-            //   SizedBox(height: shrink ? 6 : 7),
-            //   if (!shrink) _buildDots(),
-            //   SizedBox(height: shrink ? 9 : 12),
-            // ] else
-
-            SizedBox(height: shrink ? 10 : 14),
-            Text(
-              dayNumber.toString(),
-              style: isSelected ? selectedStyle : textStyle,
-            ),
             if (isSelected)
-              Text(
+              Column(
+                children: [
+                  SizedBox(height: shrink ? 6 : 7),
+                  if (!shrink) _buildDots(),
+                  SizedBox(height: shrink ? 6 : 7),
+                ],
+              )
+            else
+              SizedBox(height: shrink ? 12 : 19),
+            Center(
+              child: Text(
+                dayNumber.toString(),
+                style: isSelected ? selectedStyle : textStyle,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
                 shortName,
                 style: TextStyle(
-                  color: dayNameColor ?? activeDayColor ?? Colors.white,
+                  color: isSelected
+                      ? dayNameColor ?? activeDayColor ?? Colors.white
+                      : Colors.transparent,
                   fontWeight: FontWeight.bold,
-                  fontSize:dayNameFont,
+                  fontSize: shrink ? shrinkDayNameFontSize : dayNameFontSize,
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -119,7 +130,9 @@ class DayItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
-    return _buildDay(context);
+    return MouseRegion(
+      cursor: available ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: _buildDay(context),
+    );
   }
 }
