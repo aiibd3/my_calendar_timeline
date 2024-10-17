@@ -39,6 +39,8 @@ class CalendarTimeline extends StatefulWidget {
     this.shrink = false,
     this.locale,
     this.showYears = false,
+    this.backIcon,
+    this.forwardIcon,
   })  : assert(
           initialDate.difference(firstDate).inDays >= 0,
           'initialDate must be on or after firstDate',
@@ -82,6 +84,8 @@ class CalendarTimeline extends StatefulWidget {
   final double shrinkDayNameFontSize;
   final bool shrink;
   final String? locale;
+  final Widget? backIcon;
+  final Widget? forwardIcon;
 
   /// If true, it will show a separate row for the years.
   /// It defaults to false
@@ -338,46 +342,97 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
 
   /// Creates the row with all the years in the calendar. It will only show if
   /// [widget.showYears] is set to true. It is false by default
+  int _currentYearIndex = 0;
   Widget _buildYearList() {
     return SizedBox(
       key: const Key('ScrollableYearList'),
       height: 40,
-      child: ScrollablePositionedList.builder(
-        initialScrollIndex: _yearSelectedIndex ?? 0,
-        initialAlignment: _scrollAlignment,
-        itemScrollController: _controllerYear,
-        padding: EdgeInsets.only(left: widget.leftMargin),
-        scrollDirection: Axis.horizontal,
-        itemCount: _years.length,
-        itemBuilder: (BuildContext context, int index) {
-          final currentDate = _years[index];
-          final yearName = DateFormat.y(_locale).format(currentDate);
+      child: Row(
+        children: [
+          // Left Scroll Button (1 year back)
+          if (widget.backIcon != null)
+            IconButton(
+              icon: widget.backIcon!,
+              onPressed: () {
+                // Scroll 1 year back, but not below index 0
+                final targetIndex =
+                    (_currentYearIndex - 1).clamp(0, _years.length - 1);
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                YearItem(
-                  isSelected: _yearSelectedIndex == index,
-                  name: yearName,
-                  onTap: () => _onSelectYear(index),
-                  color: widget.monthColor,
-                  small: false,
-                  shrink: widget.shrink,
-                ),
-                if (index == _years.length - 1)
-                  // Last element to take space to do scroll to left side
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width -
-                        widget.leftMargin -
-                        (yearName.length * 10),
-                  ),
-              ],
+                // Scroll to the target index
+                _controllerYear.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentYearIndex = targetIndex;
+                });
+              },
             ),
-          );
-        },
+          Expanded(
+            child: ScrollablePositionedList.builder(
+              initialScrollIndex: _currentYearIndex,
+              initialAlignment: _scrollAlignment,
+              itemScrollController: _controllerYear,
+              padding: EdgeInsets.only(left: widget.leftMargin),
+              scrollDirection: Axis.horizontal,
+              itemCount: _years.length,
+              itemBuilder: (BuildContext context, int index) {
+                final currentDate = _years[index];
+                final yearName = DateFormat.y(_locale).format(currentDate);
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12, left: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      YearItem(
+                        isSelected: _yearSelectedIndex == index,
+                        name: yearName,
+                        onTap: () => _onSelectYear(index),
+                        color: widget.monthColor,
+                        small: false,
+                        shrink: widget.shrink,
+                      ),
+                      if (index == _years.length - 1)
+                        // Last element to take space to do scroll to left side
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width -
+                              widget.leftMargin -
+                              (yearName.length * 10),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          // Right Scroll Button (1 year forward)
+          if (widget.forwardIcon != null)
+            IconButton(
+              icon: widget.forwardIcon!,
+              onPressed: () {
+                // Scroll 1 year forward, but not beyond the last index
+                final targetIndex =
+                    (_currentYearIndex + 1).clamp(0, _years.length - 1);
+
+                // Scroll to the target index
+                _controllerYear.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentYearIndex = targetIndex;
+                });
+              },
+            ),
+        ],
       ),
     );
   }
@@ -385,115 +440,217 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   /// Creates the row with all the months in the calendar. If [widget.showYears] is set to true
   /// it will only show the months allowed in the selected year. By default it will show all
   /// months in the calendar and the small version of [YearItem] for each year in between
+  int _currentMonthIndex = 0;
   Widget _buildMonthList() {
     return SizedBox(
       height: 30,
-      child: ScrollablePositionedList.builder(
-        initialScrollIndex: _monthSelectedIndex ?? 0,
-        initialAlignment: _scrollAlignment,
-        itemScrollController: _controllerMonth,
-        padding: EdgeInsets.only(left: widget.leftMargin),
-        scrollDirection: Axis.horizontal,
-        itemCount: _months.length,
-        itemBuilder: (BuildContext context, int index) {
-          final currentDate = _months[index];
-          final monthName = DateFormat.MMMM(_locale).format(currentDate);
+      child: Row(
+        children: [
+          // Left Scroll Button (1 month back)
+          if (widget.backIcon != null)
+            IconButton(
+              icon: widget.backIcon!,
+              onPressed: () {
+                // Scroll 1 month back, but not below index 0
+                final targetIndex =
+                    (_currentMonthIndex - 1).clamp(0, _months.length - 1);
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 12, left: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (widget.firstDate.year != currentDate.year &&
-                    currentDate.month == 1 &&
-                    !widget.showYears)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: YearItem(
-                      name: DateFormat.y(_locale).format(currentDate),
-                      color: widget.monthColor,
-                      onTap: () {},
-                      shrink: widget.shrink,
-                    ),
-                  ),
-                MonthItem(
-                  isSelected: _monthSelectedIndex == index,
-                  name: monthName,
-                  onTap: () => _onSelectMonth(index),
-                  color: widget.monthColor,
-                  shrink: widget.shrink,
-                  activeColor: widget.activeBackgroundDayColor,
-                ),
-                if (index == _months.length - 1)
-                  // Last element to take space to do scroll to left side
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width -
-                        widget.leftMargin -
-                        (monthName.length * 10),
-                  ),
-              ],
+                // Scroll to the target index
+                _controllerMonth.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentMonthIndex = targetIndex;
+                });
+              },
             ),
-          );
-        },
+          Expanded(
+            child: ScrollablePositionedList.builder(
+              initialScrollIndex: _currentMonthIndex,
+              initialAlignment: _scrollAlignment,
+              itemScrollController: _controllerMonth,
+              padding: EdgeInsets.only(left: widget.leftMargin),
+              scrollDirection: Axis.horizontal,
+              itemCount: _months.length,
+              itemBuilder: (BuildContext context, int index) {
+                final currentDate = _months[index];
+                final monthName = DateFormat.MMMM(_locale).format(currentDate);
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12, left: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      if (widget.firstDate.year != currentDate.year &&
+                          currentDate.month == 1 &&
+                          !widget.showYears)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: YearItem(
+                            name: DateFormat.y(_locale).format(currentDate),
+                            color: widget.monthColor,
+                            onTap: () {},
+                            shrink: widget.shrink,
+                          ),
+                        ),
+                      MonthItem(
+                        isSelected: _monthSelectedIndex == index,
+                        name: monthName,
+                        onTap: () => _onSelectMonth(index),
+                        color: widget.monthColor,
+                        shrink: widget.shrink,
+                        activeColor: widget.activeBackgroundDayColor,
+                      ),
+                      if (index == _months.length - 1)
+                        // Last element to take space to do scroll to left side
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width -
+                              widget.leftMargin -
+                              (monthName.length * 10),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          // Right Scroll Button (1 month forward)
+          if (widget.forwardIcon != null)
+            IconButton(
+              icon: widget.forwardIcon!,
+              onPressed: () {
+                // Scroll 1 month forward, but not beyond the last index
+                final targetIndex =
+                    (_currentMonthIndex + 1).clamp(0, _months.length - 1);
+
+                // Scroll to the target index
+                _controllerMonth.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentMonthIndex = targetIndex;
+                });
+              },
+            ),
+        ],
       ),
     );
   }
+
+  int _currentIndex = 0;
 
   /// Creates the row with the day of the [selectedDate.month]. If the
   /// [selectedDate.year] && [selectedDate.month] is the [widget.firstDate] or [widget.lastDate]
   /// the days show will be the available
   Widget _buildDayList() {
     return SizedBox(
-      key: const Key('ScrollableDayList'),
       height: widget.shrink ? widget.shrinkHeight : widget.height,
-      child: ScrollablePositionedList.builder(
-        itemScrollController: _controllerDay,
-        initialScrollIndex: _daySelectedIndex ?? 0,
-        initialAlignment: _scrollAlignment,
-        scrollDirection: Axis.horizontal,
-        itemCount: _days.length,
-        padding: EdgeInsets.only(left: widget.leftMargin, right: 6),
-        itemBuilder: (BuildContext context, int index) {
-          final currentDay = _days[index];
-          final shortName =
-              DateFormat.E(_locale).format(currentDay).capitalize();
-          return Row(
-            children: <Widget>[
-              DayItem(
-                isSelected: _isSelectedDay(index),
-                dayNumber: currentDay.day,
-                shortName: shortName.length > 3
-                    ? shortName.substring(0, 3)
-                    : shortName,
-                onTap: () => _onSelectDay(index),
-                available: widget.selectableDayPredicate == null ||
-                    widget.selectableDayPredicate!(currentDay),
-                dayColor: widget.dayColor,
-                activeDayColor: widget.activeDayColor,
-                activeDayBackgroundColor: widget.activeBackgroundDayColor,
-                dotsColor: widget.dotsColor,
-                dayNameColor: widget.dayNameColor,
-                height: widget.height,
-                width: widget.width,
-                shrinkHeight: widget.shrinkHeight,
-                shrinkWidth: widget.shrinkWidth,
-                fontSize: widget.fontSize,
-                shrinkFontSize: widget.shrinkFontSize,
-                dayNameFontSize: widget.dayNameFontSize,
-                shrinkDayNameFontSize: widget.shrinkDayNameFontSize,
-                shrink: widget.shrink,
-              ),
-              if (index == _days.length - 1)
-                // Last element to take space to do scroll to left side
-                SizedBox(
-                  width: MediaQuery.of(context).size.width -
-                      widget.leftMargin -
-                      65,
-                ),
-            ],
-          );
-        },
+      child: Row(
+        children: [
+          // Left Scroll Button (2 days back)
+          if (widget.backIcon != null)
+            IconButton(
+              icon: widget.backIcon!,
+              onPressed: () {
+                // Scroll 2 days back, but not below index 0
+                final targetIndex =
+                    (_currentIndex - 2).clamp(0, _days.length - 1);
+
+                // Scroll to the target index
+                _controllerDay.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentIndex = targetIndex;
+                });
+              },
+            ),
+          Expanded(
+            child: ScrollablePositionedList.builder(
+              itemScrollController: _controllerDay,
+              initialScrollIndex: _currentIndex,
+              initialAlignment: _scrollAlignment,
+              scrollDirection: Axis.horizontal,
+              itemCount: _days.length,
+              padding: EdgeInsets.only(left: widget.leftMargin, right: 6),
+              itemBuilder: (BuildContext context, int index) {
+                final currentDay = _days[index];
+                final shortName =
+                    DateFormat.E(_locale).format(currentDay).capitalize();
+                return Row(
+                  children: <Widget>[
+                    DayItem(
+                      isSelected: _isSelectedDay(index),
+                      dayNumber: currentDay.day,
+                      shortName: shortName.length > 3
+                          ? shortName.substring(0, 3)
+                          : shortName,
+                      onTap: () => _onSelectDay(index),
+                      available: widget.selectableDayPredicate == null ||
+                          widget.selectableDayPredicate!(currentDay),
+                      dayColor: widget.dayColor,
+                      activeDayColor: widget.activeDayColor,
+                      activeDayBackgroundColor: widget.activeBackgroundDayColor,
+                      dotsColor: widget.dotsColor,
+                      dayNameColor: widget.dayNameColor,
+                      height: widget.height,
+                      width: widget.width,
+                      shrinkHeight: widget.shrinkHeight,
+                      shrinkWidth: widget.shrinkWidth,
+                      fontSize: widget.fontSize,
+                      shrinkFontSize: widget.shrinkFontSize,
+                      dayNameFontSize: widget.dayNameFontSize,
+                      shrinkDayNameFontSize: widget.shrinkDayNameFontSize,
+                      shrink: widget.shrink,
+                    ),
+                    if (index == _days.length - 1)
+                      // Last element to take space to do scroll to left side
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width -
+                            widget.leftMargin -
+                            65,
+                      ),
+                  ],
+                );
+              },
+            ),
+          ),
+          // Right Scroll Button (7 days forward)
+          if (widget.forwardIcon != null)
+            IconButton(
+              icon: widget.forwardIcon!,
+              onPressed: () {
+                // Scroll 7 days forward, but not beyond the last index
+                final targetIndex =
+                    (_currentIndex + 7).clamp(0, _days.length - 1);
+
+                // Scroll to the target index
+                _controllerDay.scrollTo(
+                  index: targetIndex,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+
+                // Update the current index
+                setState(() {
+                  _currentIndex = targetIndex;
+                });
+              },
+            ),
+        ],
       ),
     );
   }

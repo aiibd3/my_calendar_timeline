@@ -61,6 +61,14 @@ class _HomePageState extends State<HomePage> {
             ),
             CalendarTimeline(
               showYears: true,
+              backIcon: const Icon(
+                Icons.arrow_circle_left_outlined,
+                color: Colors.white,
+              ),
+              forwardIcon: const Icon(
+                Icons.arrow_circle_right_outlined,
+                color: Colors.white,
+              ),
               initialDate: _selectedDate,
               firstDate: DateTime.now(),
               lastDate: DateTime.now().add(const Duration(days: 365 * 4)),
@@ -80,7 +88,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.only(left: 16),
               child: TextButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.teal[200]),
+                  backgroundColor: WidgetStateProperty.all(Colors.teal[200]),
                 ),
                 child: const Text(
                   'RESET',
