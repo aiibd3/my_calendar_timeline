@@ -41,6 +41,7 @@ class CalendarTimeline extends StatefulWidget {
     this.showYears = false,
     this.backIcon,
     this.forwardIcon,
+    this.monthHeight,
   })  : assert(
           initialDate.difference(firstDate).inDays >= 0,
           'initialDate must be on or after firstDate',
@@ -75,6 +76,7 @@ class CalendarTimeline extends StatefulWidget {
   final Color? dotsColor;
   final Color? dayNameColor;
   final double height;
+  final double? monthHeight;
   final double width;
   final double shrinkHeight;
   final double shrinkWidth;
@@ -373,7 +375,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
             ),
           Expanded(
             child: ScrollablePositionedList.builder(
-              initialScrollIndex: _currentYearIndex,
+              initialScrollIndex: _yearSelectedIndex ?? 0,
               initialAlignment: _scrollAlignment,
               itemScrollController: _controllerYear,
               padding: EdgeInsets.only(left: widget.leftMargin),
@@ -443,7 +445,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   int _currentMonthIndex = 0;
   Widget _buildMonthList() {
     return SizedBox(
-      height: 30,
+      height: widget.monthHeight ?? 30,
       child: Row(
         children: [
           // Left Scroll Button (1 month back)
@@ -470,7 +472,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
             ),
           Expanded(
             child: ScrollablePositionedList.builder(
-              initialScrollIndex: _currentMonthIndex,
+              initialScrollIndex: _monthSelectedIndex ?? 0,
               initialAlignment: _scrollAlignment,
               itemScrollController: _controllerMonth,
               padding: EdgeInsets.only(left: widget.leftMargin),
@@ -546,7 +548,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
     );
   }
 
-  int _currentIndex = 0;
+  int _currentIndex = 10;
 
   /// Creates the row with the day of the [selectedDate.month]. If the
   /// [selectedDate.year] && [selectedDate.month] is the [widget.firstDate] or [widget.lastDate]
@@ -581,7 +583,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
           Expanded(
             child: ScrollablePositionedList.builder(
               itemScrollController: _controllerDay,
-              initialScrollIndex: _currentIndex,
+              initialScrollIndex: _daySelectedIndex ?? 0,
               initialAlignment: _scrollAlignment,
               scrollDirection: Axis.horizontal,
               itemCount: _days.length,

@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
               ),
               initialDate: _selectedDate,
-              firstDate: DateTime.now(),
+              firstDate: DateTime(2020),
               lastDate: DateTime.now().add(const Duration(days: 365 * 4)),
               onDateSelected: (date) => setState(() => _selectedDate = date),
               leftMargin: 20,
