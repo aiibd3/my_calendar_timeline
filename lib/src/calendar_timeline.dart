@@ -442,7 +442,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   /// Creates the row with all the months in the calendar. If [widget.showYears] is set to true
   /// it will only show the months allowed in the selected year. By default it will show all
   /// months in the calendar and the small version of [YearItem] for each year in between
-  int _currentMonthIndex = 0;
+  int _currentMonthIndex = 15;
   Widget _buildMonthList() {
     return SizedBox(
       height: widget.monthHeight ?? 30,
