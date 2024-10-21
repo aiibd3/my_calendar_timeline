@@ -61,6 +61,14 @@ class _HomePageState extends State<HomePage> {
             ),
             CalendarTimeline(
               showYears: true,
+              isContainDots: [
+                DateTime.now(),
+                DateTime.now().add(const Duration(days: -2)),
+                DateTime.now().add(const Duration(days: 2)),
+                DateTime.now().add(const Duration(days: 2)),
+                DateTime.now().add(const Duration(days: 2)),
+                DateTime.now().add(const Duration(days: 2)),
+              ],
               backIcon: const Icon(
                 Icons.arrow_circle_left_outlined,
                 color: Colors.white,
@@ -80,7 +88,6 @@ class _HomePageState extends State<HomePage> {
               activeDayColor: Colors.white,
               activeBackgroundDayColor: Colors.redAccent[100],
               dotsColor: const Color(0xFF333A47),
-              selectableDayPredicate: (date) => date.day != 23,
               locale: 'en',
             ),
             const SizedBox(height: 20),

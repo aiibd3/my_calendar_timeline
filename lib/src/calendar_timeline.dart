@@ -42,6 +42,7 @@ class CalendarTimeline extends StatefulWidget {
     this.backIcon,
     this.forwardIcon,
     this.monthHeight,
+    this.isContainDots = const [],
   })  : assert(
           initialDate.difference(firstDate).inDays >= 0,
           'initialDate must be on or after firstDate',
@@ -88,6 +89,7 @@ class CalendarTimeline extends StatefulWidget {
   final String? locale;
   final Widget? backIcon;
   final Widget? forwardIcon;
+  final List<DateTime> isContainDots;
 
   /// If true, it will show a separate row for the years.
   /// It defaults to false
@@ -555,7 +557,7 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
   /// the days show will be the available
   Widget _buildDayList() {
     return SizedBox(
-      height: widget.shrink ? widget.shrinkHeight : widget.height,
+      height: widget.shrink ? widget.shrinkHeight : widget.height + 20,
       child: Row(
         children: [
           // Left Scroll Button (2 days back)
@@ -592,39 +594,75 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
                 final currentDay = _days[index];
                 final shortName =
                     DateFormat.E(_locale).format(currentDay).capitalize();
-                return Row(
-                  children: <Widget>[
-                    DayItem(
-                      isSelected: _isSelectedDay(index),
-                      dayNumber: currentDay.day,
-                      shortName: shortName.length > 3
-                          ? shortName.substring(0, 3)
-                          : shortName,
-                      onTap: () => _onSelectDay(index),
-                      available: widget.selectableDayPredicate == null ||
-                          widget.selectableDayPredicate!(currentDay),
-                      dayColor: widget.dayColor,
-                      activeDayColor: widget.activeDayColor,
-                      activeDayBackgroundColor: widget.activeBackgroundDayColor,
-                      dotsColor: widget.dotsColor,
-                      dayNameColor: widget.dayNameColor,
-                      height: widget.height,
-                      width: widget.width,
-                      shrinkHeight: widget.shrinkHeight,
-                      shrinkWidth: widget.shrinkWidth,
-                      fontSize: widget.fontSize,
-                      shrinkFontSize: widget.shrinkFontSize,
-                      dayNameFontSize: widget.dayNameFontSize,
-                      shrinkDayNameFontSize: widget.shrinkDayNameFontSize,
-                      shrink: widget.shrink,
+                final isPresetDates = widget.isContainDots
+                    .where(
+                      (element) =>
+                          element.day == currentDay.day &&
+                          element.month == currentDay.month &&
+                          element.year == currentDay.year,
+                    )
+                    .toList();
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: <Widget>[
+                        DayItem(
+                          isSelected: _isSelectedDay(index),
+                          dayNumber: currentDay.day,
+                          shortName: shortName.length > 3
+                              ? shortName.substring(0, 3)
+                              : shortName,
+                          onTap: () => _onSelectDay(index),
+                          available: widget.selectableDayPredicate == null ||
+                              widget.selectableDayPredicate!(currentDay),
+                          dayColor: widget.dayColor,
+                          activeDayColor: widget.activeDayColor,
+                          activeDayBackgroundColor:
+                              widget.activeBackgroundDayColor,
+                          dotsColor: widget.dotsColor,
+                          dayNameColor: widget.dayNameColor,
+                          height: widget.height,
+                          width: widget.width,
+                          shrinkHeight: widget.shrinkHeight,
+                          shrinkWidth: widget.shrinkWidth,
+                          fontSize: widget.fontSize,
+                          shrinkFontSize: widget.shrinkFontSize,
+                          dayNameFontSize: widget.dayNameFontSize,
+                          shrinkDayNameFontSize: widget.shrinkDayNameFontSize,
+                          shrink: widget.shrink,
+                        ),
+                        if (index == _days.length - 1)
+                          // Last element to take space to do scroll to left side
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width -
+                                widget.leftMargin -
+                                65,
+                          ),
+                      ],
                     ),
-                    if (index == _days.length - 1)
-                      // Last element to take space to do scroll to left side
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width -
-                            widget.leftMargin -
-                            65,
+                    if (isPresetDates.isNotEmpty) ...[
+                      const SizedBox(
+                        height: 5,
                       ),
+                      Wrap(
+                        spacing: 3,
+                        runSpacing: 2,
+                        children: isPresetDates
+                            .map(
+                              (e) => Container(
+                                margin: const EdgeInsets.only(right: 2),
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
                   ],
                 );
               },
