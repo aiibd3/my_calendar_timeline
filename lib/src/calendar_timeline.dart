@@ -203,7 +203,10 @@ class _CalendarTimelineState extends State<CalendarTimeline> {
 
   void _selectedYearIndex() {
     _yearSelectedIndex = _years.indexOf(
-      _years.firstWhere((yearDate) => yearDate.year == _selectedDate.year),
+      _years.firstWhere(
+        (yearDate) => yearDate.year == _selectedDate.year,
+        orElse: () => _years.isNotEmpty ? _years.first : DateTime.now(),
+      ),
     );
   }
 
